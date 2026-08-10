@@ -1,0 +1,73 @@
+import { DivisionSeed } from '../geo.types';
+
+export const sylhet: DivisionSeed = {
+    name: 'Sylhet',
+    bnName: 'সিলেট',
+    districts: [
+        {
+            name: 'Sylhet',
+            bnName: 'সিলেট',
+            upazilas: [
+                { name: 'Sylhet Sadar', bnName: 'সিলেট সদর' },
+                { name: 'Balaganj', bnName: 'বালাগঞ্জ' },
+                { name: 'Beanibazar', bnName: 'বিয়ানীবাজার' },
+                { name: 'Bishwanath', bnName: 'বিশ্বনাথ' },
+                { name: 'Companiganj', bnName: 'কোম্পানীগঞ্জ' },
+                { name: 'Dakshin Surma', bnName: 'দক্ষিণ সুরমা' },
+                { name: 'Fenchuganj', bnName: 'ফেঞ্চুগঞ্জ' },
+                { name: 'Golapganj', bnName: 'গোলাপগঞ্জ' },
+                { name: 'Gowainghat', bnName: 'গোয়াইনঘাট' },
+                { name: 'Jaintiapur', bnName: 'জৈন্তাপুর' },
+                { name: 'Kanaighat', bnName: 'কানাইঘাট' },
+                { name: 'Osmani Nagar', bnName: 'ওসমানী নগর' },
+                { name: 'Zakiganj', bnName: 'জকিগঞ্জ' },
+            ],
+        },
+        {
+            name: 'Moulvibazar',
+            bnName: 'মৌলভীবাজার',
+            upazilas: [
+                { name: 'Moulvibazar Sadar', bnName: 'মৌলভীবাজার সদর' },
+                { name: 'Barlekha', bnName: 'বড়লেখা' },
+                { name: 'Juri', bnName: 'জুড়ী' },
+                { name: 'Kamalganj', bnName: 'কমলগঞ্জ' },
+                { name: 'Kulaura', bnName: 'কুলাউড়া' },
+                { name: 'Rajnagar', bnName: 'রাজনগর' },
+                { name: 'Sreemangal', bnName: 'শ্রীমঙ্গল' },
+            ],
+        },
+        {
+            name: 'Habiganj',
+            bnName: 'হবিগঞ্জ',
+            upazilas: [
+                { name: 'Habiganj Sadar', bnName: 'হবিগঞ্জ সদর' },
+                { name: 'Ajmiriganj', bnName: 'আজমিরীগঞ্জ' },
+                { name: 'Bahubal', bnName: 'বাহুবল' },
+                { name: 'Baniyachong', bnName: 'বানিয়াচং' },
+                { name: 'Chunarughat', bnName: 'চুনারুঘাট' },
+                { name: 'Lakhai', bnName: 'লাখাই' },
+                { name: 'Madhabpur', bnName: 'মাধবপুর' },
+                { name: 'Nabiganj', bnName: 'নবীগঞ্জ' },
+                { name: 'Shayestaganj', bnName: 'শায়েস্তাগঞ্জ' },
+            ],
+        },
+        {
+            name: 'Sunamganj',
+            bnName: 'সুনামগঞ্জ',
+            upazilas: [
+                { name: 'Sunamganj Sadar', bnName: 'সুনামগঞ্জ সদর' },
+                { name: 'Bishwamvarpur', bnName: 'বিশ্বম্ভরপুর' },
+                { name: 'Chhatak', bnName: 'ছাতক' },
+                { name: 'Dakshin Sunamganj', bnName: 'দক্ষিণ সুনামগঞ্জ' },
+                { name: 'Derai', bnName: 'দিরাই' },
+                { name: 'Dharampasha', bnName: 'ধর্মপাশা' },
+                { name: 'Dowarabazar', bnName: 'দোয়ারাবাজার' },
+                { name: 'Jagannathpur', bnName: 'জগন্নাথপুর' },
+                { name: 'Jamalganj', bnName: 'জামালগঞ্জ' },
+                { name: 'Madhyanagar', bnName: 'মধ্যনগর' },
+                { name: 'Shalla', bnName: 'শাল্লা' },
+                { name: 'Tahirpur', bnName: 'তাহিরপুর' },
+            ],
+        },
+    ],
+};
