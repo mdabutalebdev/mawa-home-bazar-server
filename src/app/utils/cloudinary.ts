@@ -17,7 +17,10 @@ export const isCloudinaryEnabled = Boolean(
 
 // Folder where locally-uploaded files are written. Served statically at
 // GET /uploads/<filename> (see app.ts). Created on boot when using disk mode.
-export const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
+export const UPLOAD_DIR = process.env.VERCEL 
+    ? path.join('/tmp', 'uploads')
+    : path.join(process.cwd(), 'uploads');
+    
 if (!isCloudinaryEnabled && !fs.existsSync(UPLOAD_DIR)) {
     fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }

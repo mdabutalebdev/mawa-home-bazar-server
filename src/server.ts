@@ -61,34 +61,44 @@ connectDB()
     .catch((err) => console.error('❌ Initial MongoDB connection failed:', err));
 
 // ── Start Server ─────────────────────────────────────────────────
-const server = app.listen(config.port, () => {
-    console.log('');
-    console.log('╔══════════════════════════════════════════════════╗');
-    console.log('║                                                  ║');
-    console.log('║   🛒 Mawa Homebazar BD API Server Started!             ║');
-    console.log('║                                                  ║');
-    console.log(`║   🌐 URL: http://localhost:${config.port}                  ║`);
-    console.log(`║   🔧 Env:  ${String(config.env).padEnd(37)}║`);
-    console.log('║                                                  ║');
-    console.log('╚══════════════════════════════════════════════════╝');
-    console.log('');
-});
+let server: any;
 
-// ── Real-time Messaging (Socket.IO) ───────────────────────────────
-initSocket(server);
+if (!process.env.VERCEL) {
+    server = app.listen(config.port, () => {
+        console.log('');
+        console.log('╔══════════════════════════════════════════════════╗');
+        console.log('║                                                  ║');
+        console.log('║   🛒 Mawa Homebazar BD API Server Started!             ║');
+        console.log('║                                                  ║');
+        console.log(`║   🌐 URL: http://localhost:${config.port}                  ║`);
+        console.log(`║   🔧 Env:  ${String(config.env).padEnd(37)}║`);
+        console.log('║                                                  ║');
+        console.log('╚══════════════════════════════════════════════════╝');
+        console.log('');
+    });
 
-// ── Steadfast courier auto status-sync (opt-in via STEADFAST_AUTO_SYNC) ──
-startCourierAutoSync();
+    // ── Real-time Messaging (Socket.IO) ───────────────────────────────
+    initSocket(server);
+
+    // ── Steadfast courier auto status-sync (opt-in via STEADFAST_AUTO_SYNC) ──
+    startCourierAutoSync();
+}
 
 process.on('unhandledRejection', (error: Error) => {
     console.error('💥 UNHANDLED REJECTION! Shutting down...');
     console.error(error.message);
-    server.close(() => process.exit(1));
+    if (server) {
+        server.close(() => process.exit(1));
+    } else {
+        process.exit(1);
+    }
 });
 
 process.on('SIGTERM', () => {
     console.log('👋 SIGTERM received. Shutting down gracefully...');
-    server.close(() => console.log('💤 Process terminated.'));
+    if (server) {
+        server.close(() => console.log('💤 Process terminated.'));
+    }
 });
 
 export default app;
