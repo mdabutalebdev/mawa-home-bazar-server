@@ -43,6 +43,26 @@ const DEFAULT_HOME_SECTIONS = {
             { icon: '🌐', title: 'ড্রপশিপিং ওয়েবসাইট',    description: '', link: '', active: true, order: 11 },
         ],
     },
+    serviceCompaniesSection: {
+        enabled: true,
+        // Bilingual fields MUST be `{ en, bn }` objects — Mongoose coerces a
+        // bare string to an empty { en:'', bn:'' } and the text vanishes.
+        title:    { en: 'Our Company Services', bn: 'আমাদের কোম্পানি সার্ভিস সমূহ' },
+        subtitle: { en: 'Our trusted partner companies & services', bn: 'আমাদের সাথে সংযুক্ত পার্টনার প্রতিষ্ঠান ও সার্ভিস সমূহ।' },
+        // Sample defaults so the section is visible immediately on a fresh
+        // install; admin replaces the logos/names/descriptions from the panel.
+        // When admin clears all items, the auto-migrate below re-seeds these
+        // defaults — turn the whole section off with `enabled: false` if you
+        // want it hidden instead.
+        items: [
+            { logo: '', title: { en: 'Courier Partner',    bn: 'কুরিয়ার পার্টনার' },   description: { en: 'Fast nationwide delivery service.',        bn: 'সারাদেশে দ্রুত ডেলিভারি সেবা।' },          link: '', active: true, order: 0 },
+            { logo: '', title: { en: 'Payment Gateway',    bn: 'পেমেন্ট গেটওয়ে' },     description: { en: 'bKash, Nagad, Rocket & card payments.',    bn: 'বিকাশ, নগদ, রকেট ও কার্ড পেমেন্ট।' },       link: '', active: true, order: 1 },
+            { logo: '', title: { en: 'Warehouse',          bn: 'ওয়্যারহাউস' },          description: { en: 'Safe, managed product storage.',           bn: 'নিরাপদ ও ব্যবস্থাপনাযুক্ত প্রোডাক্ট স্টোরেজ।' }, link: '', active: true, order: 2 },
+            { logo: '', title: { en: 'Digital Marketing',  bn: 'ডিজিটাল মার্কেটিং' },    description: { en: 'Facebook, Google & YouTube campaigns.',    bn: 'ফেসবুক, গুগল ও ইউটিউব ক্যাম্পেইন।' },        link: '', active: true, order: 3 },
+            { logo: '', title: { en: 'Customer Support',   bn: 'কাস্টমার সাপোর্ট' },     description: { en: '24/7 call center & live chat.',            bn: '২৪/৭ কল সেন্টার ও লাইভ চ্যাট সেবা।' },        link: '', active: true, order: 4 },
+            { logo: '', title: { en: 'Packaging Service',  bn: 'প্যাকেজিং সার্ভিস' },    description: { en: 'Custom branded packaging solutions.',      bn: 'কাস্টম ব্র্যান্ডেড প্যাকেজিং সলিউশন।' },      link: '', active: true, order: 5 },
+        ],
+    },
     featuresSection: {
         enabled: true,
         title: 'আমাদের স্পেশিয়াল ফিচারস',
@@ -182,6 +202,7 @@ const SiteContentService = {
         // Auto-migrate: back-fill new home sections for docs created before they existed.
         // The block is skipped once every section is present, so it doesn't run twice.
         if (!content.get('statsBar') || !content.get('aboutSection') || !content.get('servicesSection')
+            || !content.get('serviceCompaniesSection')
             || !content.get('featuresSection') || !content.get('categoryShowcaseSection')
             || !content.get('howItWorksSection') || !content.get('experienceSection')
             || !content.get('reviewsSection')) {
@@ -189,6 +210,7 @@ const SiteContentService = {
             if (!content.get('statsBar'))               patch.statsBar               = DEFAULT_HOME_SECTIONS.statsBar;
             if (!content.get('aboutSection'))           patch.aboutSection           = DEFAULT_HOME_SECTIONS.aboutSection;
             if (!content.get('servicesSection'))        patch.servicesSection        = DEFAULT_HOME_SECTIONS.servicesSection;
+            if (!content.get('serviceCompaniesSection')) patch.serviceCompaniesSection = DEFAULT_HOME_SECTIONS.serviceCompaniesSection;
             if (!content.get('featuresSection'))        patch.featuresSection        = DEFAULT_HOME_SECTIONS.featuresSection;
             if (!content.get('categoryShowcaseSection')) patch.categoryShowcaseSection = DEFAULT_HOME_SECTIONS.categoryShowcaseSection;
             if (!content.get('howItWorksSection'))      patch.howItWorksSection      = DEFAULT_HOME_SECTIONS.howItWorksSection;
@@ -197,6 +219,31 @@ const SiteContentService = {
             content = await SiteContent.findOneAndUpdate(
                 { _key: 'main' },
                 { $set: patch },
+                { new: true }
+            );
+        }
+
+        // One-time (re)seed for the Service Companies section. Early builds of
+        // this section stored bilingual fields as bare strings, which Mongoose
+        // coerced to empty { en:'', bn:'' } — so an empty title means the
+        // section was never seeded with real content. Re-seed the whole block
+        // (title, subtitle, items) while it is still blank. Once the admin sets
+        // a real title (or their own companies), this never runs again; hide the
+        // section entirely with `serviceCompaniesSection.enabled = false`.
+        const sc: any = content?.get('serviceCompaniesSection');
+        const scTitle = sc?.title || {};
+        const titleBlank = !scTitle.en && !scTitle.bn;
+        const itemsBlank = !Array.isArray(sc?.items) || sc.items.length === 0;
+        if (sc && (titleBlank || itemsBlank)) {
+            content = await SiteContent.findOneAndUpdate(
+                { _key: 'main' },
+                {
+                    $set: {
+                        'serviceCompaniesSection.title':    DEFAULT_HOME_SECTIONS.serviceCompaniesSection.title,
+                        'serviceCompaniesSection.subtitle': DEFAULT_HOME_SECTIONS.serviceCompaniesSection.subtitle,
+                        'serviceCompaniesSection.items':    DEFAULT_HOME_SECTIONS.serviceCompaniesSection.items,
+                    },
+                },
                 { new: true }
             );
         }

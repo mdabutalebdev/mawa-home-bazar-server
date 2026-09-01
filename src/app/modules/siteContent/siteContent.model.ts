@@ -216,6 +216,25 @@ const siteContentSchema = new Schema({
         }],
     },
 
+    // ── Service Companies Section
+    // Admin-managed showcase of partner / service-provider companies (logo +
+    // title + description). Rendered on the homepage before the product grid.
+    // Each card can carry an optional `link` (external URL or internal path);
+    // when blank the card is non-interactive.
+    serviceCompaniesSection: {
+        enabled: { type: Boolean, default: true },
+        title:    bi(),
+        subtitle: bi(),
+        items: [{
+            logo: { type: String, default: '' },        // company logo image URL
+            title:       bi(),                          // company name (bilingual)
+            description: bi(),                          // short blurb (bilingual)
+            link: { type: String, default: '' },        // optional href — blank = non-clickable card
+            active: { type: Boolean, default: true },
+            order: { type: Number, default: 0 },
+        }],
+    },
+
     // ── Features Section
     featuresSection: {
         enabled: { type: Boolean, default: true },
