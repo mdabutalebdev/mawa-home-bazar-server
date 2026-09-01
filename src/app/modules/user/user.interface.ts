@@ -1,17 +1,14 @@
 import { Document, Model, Types } from 'mongoose';
 
 export type UserRole =
-    | 'superadmin'
     | 'admin'
     | 'user'
     | 'company'
     | 'dealer'
-    | 'retailer'
-    | 'marketing_officer'
-    | 'delivery_man';
+    | 'retailer';
 
-/** Roles that own a partner profile and need owner approval before trading. */
-export const PARTNER_ROLES: UserRole[] = ['company', 'dealer', 'retailer', 'marketing_officer', 'delivery_man'];
+/** Roles that own a partner profile and need admin approval before trading. */
+export const PARTNER_ROLES: UserRole[] = ['company', 'dealer', 'retailer'];
 
 export interface IShippingAddress {
     label: string;

@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { Dealer } from './dealer.model';
+import { District } from '../geo/geo.model';
 import { User } from '../user/user.model';
 import GeoService from '../geo/geo.service';
 import AppError from '../../utils/AppError';
@@ -105,6 +106,80 @@ const DealerService = {
     },
 
     // ── Admin ────────────────────────────────────────
+
+    /**
+     * The admin creates a dealer outright — no application step. This also
+     * provisions the owner's login account (role `dealer`) and the profile is
+     * born `approved`. The one-approved-dealer-per-upazila rule is enforced up
+     * front. The user is created first; if the dealer profile then fails we
+     * delete that user (local MongoDB is standalone — no transaction available).
+     */
+    async adminCreate(payload: Payload, adminId: string) {
+        const {
+            ownerFirstName, ownerLastName, ownerEmail, ownerPhone, ownerPassword,
+            commissionRate, level = 'upazila', upazila, district, ...rest
+        } = payload;
+
+        const email = String(ownerEmail).toLowerCase().trim();
+        if (await User.isUserExists(email)) {
+            throw new AppError(400, 'An account already exists with this email.');
+        }
+        if (ownerPhone) {
+            const phoneTaken = await User.findOne({ phone: String(ownerPhone).trim() }).select('_id');
+            if (phoneTaken) throw new AppError(400, 'This phone number is already registered.');
+        }
+
+        // ── Resolve the territory by dealer level ──
+        // 'upazila' → covers one upazila (one dealer per upazila).
+        // 'district' → covers a whole district as the fallback (one per district).
+        let territory: Payload;
+        if (level === 'district') {
+            if (!district) throw new AppError(400, 'District is required for a district dealer.');
+            const districtDoc: any = await District.findById(String(district)).lean();
+            if (!districtDoc) throw new AppError(404, 'District not found');
+            const holder = await Dealer.findOne({ district: districtDoc._id, level: 'district', status: 'approved' }).select('_id');
+            if (holder) throw new AppError(409, 'This district already has an approved district dealer.');
+            territory = { level: 'district', upazila: null, district: districtDoc._id, division: idOf(districtDoc.division) };
+        } else {
+            if (!upazila) throw new AppError(400, 'Upazila is required for an upazila dealer.');
+            const upazilaDoc: any = await GeoService.getUpazilaById(String(upazila));
+            if (!upazilaDoc) throw new AppError(404, 'Upazila not found');
+            // One approved dealer per upazila — reject before creating anything.
+            const holder = await Dealer.findOne({ upazila: upazilaDoc._id, status: 'approved', level: { $ne: 'district' } }).select('_id');
+            if (holder) throw new AppError(409, 'This upazila already has an approved dealer');
+            territory = { level: 'upazila', upazila: upazilaDoc._id, district: idOf(upazilaDoc.district), division: idOf(upazilaDoc.division) };
+        }
+
+        const user = await User.create({
+            firstName: ownerFirstName,
+            lastName: ownerLastName || '.',
+            email,
+            phone: ownerPhone ? String(ownerPhone).trim() : '',
+            password: ownerPassword,
+            role: 'dealer',
+            status: 'active',
+            isEmailVerified: true,
+        });
+
+        try {
+            const dealer = await Dealer.create({
+                ...stripBlocked(rest),
+                user: user._id,
+                ...territory,
+                status: 'approved',
+                approvedBy: new Types.ObjectId(adminId),
+                approvedAt: new Date(),
+                ...(commissionRate !== undefined ? { commissionRate: Number(commissionRate) } : {}),
+            });
+            // Only upazila dealers change per-upazila coverage flags.
+            if (level !== 'district' && dealer.upazila) await GeoService.refreshCoverage(String(dealer.upazila));
+            return dealer;
+        } catch (err) {
+            await User.findByIdAndDelete(user._id);
+            throw err;
+        }
+    },
+
     async getAllDealers(query: Payload) {
         const page = Number(query.page) || 1;
         const limit = Number(query.limit) || 20;

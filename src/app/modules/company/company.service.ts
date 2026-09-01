@@ -59,6 +59,57 @@ const CompanyService = {
         return company;
     },
 
+    /**
+     * The admin creates a company outright — no application step. This also
+     * provisions the owner's login account (role `company`) and the profile is
+     * born `approved`, since the admin creating it is the approval.
+     *
+     * The user is created first; if the company profile then fails validation we
+     * delete that user so a half-made partner is never left behind (local
+     * MongoDB is standalone, so a transaction isn't available).
+     */
+    async adminCreate(payload: Record<string, unknown>, adminId: string) {
+        const {
+            ownerFirstName, ownerLastName, ownerEmail, ownerPhone, ownerPassword,
+            commissionRate, ...rest
+        } = payload as Record<string, any>;
+
+        const email = String(ownerEmail).toLowerCase().trim();
+        if (await User.isUserExists(email)) {
+            throw new AppError(400, 'An account already exists with this email.');
+        }
+        if (ownerPhone) {
+            const phoneTaken = await User.findOne({ phone: String(ownerPhone).trim() }).select('_id');
+            if (phoneTaken) throw new AppError(400, 'This phone number is already registered.');
+        }
+
+        const user = await User.create({
+            firstName: ownerFirstName,
+            lastName: ownerLastName || '.',
+            email,
+            phone: ownerPhone ? String(ownerPhone).trim() : '',
+            password: ownerPassword,
+            role: 'company',
+            status: 'active',
+            isEmailVerified: true,
+        });
+
+        try {
+            const company = await Company.create({
+                ...pick(rest, OWNER_EDITABLE),
+                user: user._id,
+                status: 'approved',
+                approvedBy: adminId,
+                approvedAt: new Date(),
+                ...(commissionRate !== undefined ? { commissionRate: Number(commissionRate) } : {}),
+            });
+            return company;
+        } catch (err) {
+            await User.findByIdAndDelete(user._id);
+            throw err;
+        }
+    },
+
     async getMyProfile(userId: string) {
         const company = await Company.findOne({ user: userId })
             .populate('categories', 'name slug')

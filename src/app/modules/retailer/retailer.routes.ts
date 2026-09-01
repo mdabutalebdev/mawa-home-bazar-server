@@ -22,27 +22,27 @@ router.patch('/me', authMiddleware, validateRequest(updateMyRetailerValidation),
 router.get(
     '/by-upazila/:upazilaId',
     authMiddleware,
-    authorizeRoles('dealer', 'admin', 'superadmin'),
+    authorizeRoles('dealer', 'admin'),
     RetailerController.getByUpazila
 );
 
 // ── Admin ────────────────────────────────────────
 // Declared after '/me' and '/by-upazila' so those are not swallowed by '/:id'.
-router.get('/', authMiddleware, authorizeRoles('admin', 'superadmin'), RetailerController.getAll);
-router.get('/:id', authMiddleware, authorizeRoles('admin', 'superadmin'), RetailerController.getById);
-router.patch('/:id/approve', authMiddleware, authorizeRoles('admin', 'superadmin'), RetailerController.approve);
+router.get('/', authMiddleware, authorizeRoles('admin'), RetailerController.getAll);
+router.get('/:id', authMiddleware, authorizeRoles('admin'), RetailerController.getById);
+router.patch('/:id/approve', authMiddleware, authorizeRoles('admin'), RetailerController.approve);
 router.patch(
     '/:id/reject',
     authMiddleware,
-    authorizeRoles('admin', 'superadmin'),
+    authorizeRoles('admin'),
     validateRequest(rejectRetailerValidation),
     RetailerController.reject
 );
-router.patch('/:id/suspend', authMiddleware, authorizeRoles('admin', 'superadmin'), RetailerController.suspend);
+router.patch('/:id/suspend', authMiddleware, authorizeRoles('admin'), RetailerController.suspend);
 router.patch(
     '/:id',
     authMiddleware,
-    authorizeRoles('admin', 'superadmin'),
+    authorizeRoles('admin'),
     validateRequest(adminUpdateRetailerValidation),
     RetailerController.update
 );

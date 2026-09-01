@@ -19,7 +19,13 @@ const SiteContentController = {
     // PATCH /api/site-content/:section — Admin only (section update)
     updateSection: catchAsync(async (req: Request, res: Response) => {
         const { section } = req.params;
-        const validSections = ['ticker', 'contact', 'floating', 'footer', 'defaultTagline', 'seo', 'announcement', 'legalPages'];
+        const validSections = [
+            'ticker', 'contact', 'floating', 'footer', 'defaultTagline', 'seo', 'announcement', 'legalPages',
+            'heroSlides', 'homeBanner',
+            // Homepage landing sections
+            'statsBar', 'aboutSection', 'servicesSection', 'featuresSection',
+            'categoryShowcaseSection', 'howItWorksSection', 'experienceSection', 'reviewsSection',
+        ];
         if (!validSections.includes(section)) {
             return sendResponse(res, { statusCode: 400, success: false, message: `Invalid section: ${section}` });
         }

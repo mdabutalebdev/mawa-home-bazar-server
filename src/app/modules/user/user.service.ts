@@ -93,7 +93,7 @@ const UserService = {
         // SECURITY: 'role' & 'permissions' are intentionally NOT updatable here.
         // Changing a user's role is a SUPERADMIN-only action handled exclusively by the
         // role module (PATCH /api/roles/:userId). This prevents a regular admin from
-        // promoting anyone (including themselves) to admin/superadmin.
+        // promoting anyone (including themselves) to admin.
         const allowed = ['firstName', 'lastName', 'phone', 'status', 'isEmailVerified'];
         for (const key of allowed) {
             if (payload[key] !== undefined) allowedFields[key] = payload[key];

@@ -352,10 +352,15 @@ const OrderService = {
             // never block order flow
         }
 
-        // ── In-app notifications: customer + all admins ──
-        // Fire-and-forget: any failure here must NEVER break order placement.
+        // ── In-app notifications: customer + admin + company + dealer ──
+        // The three parties who fulfil an order — the supplying company, the
+        // supervising dealer for the buyer's upazila, and every admin — are all
+        // notified, plus the customer. Fire-and-forget: any failure here must
+        // NEVER break order placement.
         try {
             const { NotificationService } = require('../notification/notification.service');
+            const { Company } = require('../company/company.model');
+            const { Dealer } = require('../dealer/dealer.model');
             const orderIdStr = order._id.toString();
 
             const fanOut = async () => {
@@ -369,7 +374,7 @@ const OrderService = {
                     meta: { orderId: orderIdStr, total },
                 });
 
-                // 2) Every admin / superadmin
+                // 2) Every admin
                 await NotificationService.notifyAdmins({
                     type: 'new_order',
                     title: 'New order placed',
@@ -377,6 +382,36 @@ const OrderService = {
                     link: '/dashboard/admin/orders/' + orderIdStr,
                     meta: { orderId: orderIdStr, total },
                 });
+
+                // 3) The supplying company (its owner's user account)
+                if (order.company) {
+                    const company = await Company.findById(order.company).select('user').lean();
+                    if (company?.user) {
+                        await NotificationService.notify({
+                            user: company.user,
+                            type: 'new_order',
+                            title: 'New order for your products',
+                            message: `You have a new order ${order.orderId || orderIdStr} (৳${total}).`,
+                            link: '/dashboard/company/orders',
+                            meta: { orderId: orderIdStr, total },
+                        });
+                    }
+                }
+
+                // 4) The supervising dealer for the buyer's upazila
+                if (order.dealer) {
+                    const dealer = await Dealer.findById(order.dealer).select('user').lean();
+                    if (dealer?.user) {
+                        await NotificationService.notify({
+                            user: dealer.user,
+                            type: 'new_order',
+                            title: 'New order in your area',
+                            message: `A new order ${order.orderId || orderIdStr} was placed in your area (৳${total}).`,
+                            link: '/dashboard/dealer/orders',
+                            meta: { orderId: orderIdStr, total },
+                        });
+                    }
+                }
             };
 
             fanOut().catch(() => {});

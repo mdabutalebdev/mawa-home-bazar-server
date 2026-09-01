@@ -5,6 +5,6 @@ import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
 const router = express.Router();
 
 // Admin-only: view the activity log feed.
-router.get('/', authMiddleware, authorizeRoles('admin', 'superadmin'), ActivityLogController.getAll);
+router.get('/', authMiddleware, authorizeRoles('admin'), ActivityLogController.getAll);
 
 export const ActivityLogRoutes = router;

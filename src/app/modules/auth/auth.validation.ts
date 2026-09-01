@@ -8,6 +8,10 @@ export const registerValidation = z.object({
         phone: z.string().min(6, 'Invalid phone number').optional(),
         password: z.string().min(6, 'Password must be at least 6 characters'),
         location: z.string().optional(),
+        // Public self-signup may only pick a plain customer or a retailer.
+        // Company/dealer go through the apply → admin-approve flow, and admin is
+        // never self-assignable.
+        role: z.enum(['user', 'retailer']).optional().default('user'),
     }).refine(data => data.email || data.phone, {
         message: 'Email or phone number is required',
         path: ['email'],

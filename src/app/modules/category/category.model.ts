@@ -5,6 +5,11 @@ const categorySchema = new Schema(
         name: { type: String, required: [true, 'Category name is required'], trim: true, maxlength: 100 },
         slug: { type: String, unique: true, lowercase: true },
         description: { type: String, default: '' },
+        // Which company created this category. `null` = an admin/global category
+        // (the shared ones every seller can use). A non-null value means the
+        // category belongs to that company; it may still be shown on the
+        // storefront but only the owning company (or an admin) can edit it.
+        company: { type: Schema.Types.ObjectId, ref: 'Company', default: null },
         icon: { type: String, default: '' },
         image: { type: String, default: '' },
         banner: { type: String, default: '' },
@@ -25,11 +30,21 @@ const categorySchema = new Schema(
 
 categorySchema.index({ parent: 1 });
 categorySchema.index({ isActive: 1, isDeleted: 1 });
+categorySchema.index({ company: 1 });
 
-// Auto-generate slug
-categorySchema.pre('save', function (next) {
+// Auto-generate a UNIQUE slug. Deduped with a counter because company-created
+// categories can legitimately reuse a name a global category already holds
+// (two companies may both add "Accessories") and the slug is a unique key.
+categorySchema.pre('save', async function (next) {
     if (this.isModified('name') && !this.slug) {
-        this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        const base = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'category';
+        let slug = base;
+        let n = 1;
+        // eslint-disable-next-line no-await-in-loop
+        while (await Category.exists({ slug })) {
+            slug = `${base}-${++n}`;
+        }
+        this.slug = slug;
     }
     next();
 });

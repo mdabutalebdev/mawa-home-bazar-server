@@ -6,15 +6,15 @@ import { updateUserRoleValidation } from './role.validation';
 
 const router = express.Router();
 
-// ── Permission catalogue (admin + superadmin, read-only) ──
-router.get('/permissions', authMiddleware, authorizeRoles('admin', 'superadmin'), RoleController.getPermissions);
+// ── Permission catalogue (admin, read-only) ──
+router.get('/permissions', authMiddleware, authorizeRoles('admin'), RoleController.getPermissions);
 
-// ── Staff management (superadmin only) ──
-router.get('/staff', authMiddleware, authorizeRoles('superadmin'), RoleController.getStaff);
+// ── Staff management (admin only) ──
+router.get('/staff', authMiddleware, authorizeRoles('admin'), RoleController.getStaff);
 router.patch(
     '/:userId',
     authMiddleware,
-    authorizeRoles('superadmin'),
+    authorizeRoles('admin'),
     validateRequest(updateUserRoleValidation),
     RoleController.updateUserRole
 );

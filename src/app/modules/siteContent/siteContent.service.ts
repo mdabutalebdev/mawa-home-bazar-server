@@ -1,5 +1,108 @@
 import { SiteContent } from './siteContent.model';
 
+// ═══════════════════════════════════════════════════════════════════════
+// Default seed content for the six landing sections rendered on the
+// homepage. Copy mirrors the Bengali wording the client asked us to
+// reproduce, and each section can be re-edited from Site Content → Home
+// Sections in the admin panel.
+// ═══════════════════════════════════════════════════════════════════════
+const DEFAULT_HOME_SECTIONS = {
+    statsBar: {
+        enabled: true,
+        items: [
+            { value: '2,00,000+', label: 'রিসেলার / ড্রপশিপার', icon: '', active: true, order: 0 },
+            { value: '10,000+',   label: 'ট্রেন্ডি প্রোডাক্টস', icon: '', active: true, order: 1 },
+            { value: '100K+',     label: 'অ্যাপস ডাউনলোড',     icon: '', active: true, order: 2 },
+            { value: '24/7',      label: 'সাপোর্ট সেন্টার',    icon: '', active: true, order: 3 },
+        ],
+    },
+    aboutSection: {
+        enabled: true,
+        title: 'আমাদের সম্পর্কে',
+        description: 'মাওয়া হোমবাজার বিডি বাংলাদেশের একটি বিশ্বস্ত অনলাইন মার্কেটপ্লেস। কোন প্রকার পুঁজি বা ইনভেস্টমেন্ট ছাড়াই ঘরে বসে অসংখ্য ক্যাটেগরির প্রায় দশ হাজারেরও বেশি প্রোডাক্ট নিয়ে বিজনেস করতে পারবেন অনলাইনে আমাদের মাধ্যমে। ইনস্ট্যান্ট পেমেন্ট, ভেরিফাইড প্রোডাক্ট, ছবি দিয়ে সার্চ, ক্যাশ অন ডেলিভারি এবং কল সেন্টার সাপোর্ট সহ অত্যাধুনিক সকল সুবিধা রয়েছে এখানে।',
+        imageUrl: '',
+        ctaLabel: 'বিস্তারিত জানুন',
+        ctaHref: '/about',
+    },
+    servicesSection: {
+        enabled: true,
+        title: 'আমাদের সার্ভিস সমূহ',
+        subtitle: 'আমাদের এই প্লাটফর্মের মাধ্যমে আপনি পাচ্ছেন অসংখ্য বিজনেস এবং ইনকাম করার সুযোগ।',
+        items: [
+            { icon: '🛍️', title: 'রিসেলিং / ড্রপশিপিং',   description: '', link: '', active: true, order: 0 },
+            { icon: '📦', title: 'হোলসেল প্রোডাক্ট',       description: '', link: '', active: true, order: 1 },
+            { icon: '🖨️', title: 'কাস্টমাইজ প্রিন্ট',       description: '', link: '', active: true, order: 2 },
+            { icon: '🤝', title: 'সাপ্লায়ার / ভেন্ডরশিপ', description: '', link: '', active: true, order: 3 },
+            { icon: '👑', title: 'লিডারশিপ ইনকাম',         description: '', link: '', active: true, order: 4 },
+            { icon: '💼', title: 'ফ্রিল্যান্সিং মার্কেটপ্লেস', description: '', link: '', active: true, order: 5 },
+            { icon: '⚡', title: 'মাইক্রো জবস',           description: '', link: '', active: true, order: 6 },
+            { icon: '📱', title: 'মোবাইল রিচার্জ',         description: '', link: '', active: true, order: 7 },
+            { icon: '📢', title: 'ডিজিটাল মার্কেটিং',      description: '', link: '', active: true, order: 8 },
+            { icon: '🚀', title: 'বুস্টিং সার্ভিস',         description: '', link: '', active: true, order: 9 },
+            { icon: '🛒', title: 'ই-কমার্স ওয়েবসাইট',     description: '', link: '', active: true, order: 10 },
+            { icon: '🌐', title: 'ড্রপশিপিং ওয়েবসাইট',    description: '', link: '', active: true, order: 11 },
+        ],
+    },
+    featuresSection: {
+        enabled: true,
+        title: 'আমাদের স্পেশিয়াল ফিচারস',
+        subtitle: 'ড্রপশিপিং এবং রিসেলিং এর জগতে আমরাই দিচ্ছি সবচেয়ে বেশি এবং আকর্ষণীয় সুবিধা।',
+        items: [
+            { icon: '💰', title: 'জিরো ইনভেস্টমেন্ট', description: 'কোন রকম পুঁজি বা ইনভেস্টমেন্ট ছাড়াই সম্পূর্ণ ফ্রি\'তে রেজিস্ট্রেশন করে ফুল ক্যাশ অন ডেলিভারিতে বিজনেস করতে পারবেন আমাদের মাধ্যমে।', active: true, order: 0 },
+            { icon: '⚡', title: 'ইন্সট্যান্ট পেমেন্ট', description: 'আপনার অর্ডার ডেলিভারি হওয়ার পর প্রফিটের টাকা উইথড্র দেওয়ার সাথে সাথেই অটোমেটিক ভাবে সেকেন্ডেই চলে যাবে আপনার একাউন্টে।', active: true, order: 1 },
+            { icon: '💵', title: 'ক্যাশ অন ডেলিভারি', description: 'আমাদের প্লাটফর্মের মাধ্যমে বিজনেস করে আপনি কাস্টমাররের নিকট থেকে ফুল ক্যাশ অন ডেলিভারি কন্ডিশনে অর্ডার নিতে পারবেন।', active: true, order: 2 },
+            { icon: '✅', title: 'ভেরিফাইড প্রডাক্টস', description: 'প্রোডাক্ট কোয়ালিটির দিক দিয়ে আমাদের রয়েছে ভেরিফাইড এবং বুস্টিং ক্যাটাগরির প্রোডাক্ট। এছাড়াও কোয়ালিটি অনুযায়ী রয়েছে প্রোডাক্ট রেটিং।', active: true, order: 3 },
+            { icon: '🔍', title: 'ছবি দিয়ে সার্চ',    description: 'কাস্টমারের নিকট থেকে পাওয়া অর্ডার গুলো প্লেস করতে প্রোডাক্টটি সহজেই ছবি দিয়ে সার্চ করে খুঁজে বের করার সিস্টেম রয়েছে আমাদের প্লাটফর্মে।', active: true, order: 4 },
+            { icon: '🚚', title: 'ফাস্ট ডেলিভারি',    description: 'বিকেল ৩ টার মধ্যে অর্ডার করলে আমরা ঐদিনই বুকিং দিয়ে থাকি। আমরা ঢাকার মধ্যে ৪৮ এবং ঢাকার বাহিরে ৭২ ঘণ্টায় হোম ডেলিভারি দিয়ে থাকি।', active: true, order: 5 },
+            { icon: '🎥', title: 'অরিজিনাল ভিডিও',   description: 'আমরা প্রত্যেকটা প্রোডাক্টের অরিজিনাল ঝুমিং ভিডিও দিয়ে থাকি। যেন আপনি এবং আপনার কাস্টমার প্রোডাক্টের অরিজিনাল ভিডিও দেখে অর্ডার করতে পারে।', active: true, order: 6 },
+            { icon: '☎️', title: '২৪/৭ সাপোর্ট',      description: 'আপনার অর্ডার সংক্রান্ত যেকোনো বিষয়ে সাপোর্ট দেওয়ার জন্য আমাদের রয়েছে প্রফেশনাল কল সেন্টার, ফেসবুক পেজ এবং KAM সাপোর্ট সিস্টেম।', active: true, order: 7 },
+        ],
+    },
+    categoryShowcaseSection: {
+        enabled: true,
+        title: 'আমাদের প্রোডাক্ট সমূহ',
+        subtitle: 'আমাদের রয়েছে বিভিন্ন ক্যাটেগরির অসংখ্য প্রোডাক্ট, যেগুলো আপনি সহজেই সেল করতে পারবেন অনলাইনে।',
+        showCount: 60,
+        onlyHome: false,
+    },
+    howItWorksSection: {
+        enabled: true,
+        title: 'কিভাবে আমাদের মাধ্যমে বিজনেস করবেন',
+        subtitle: 'কোনরকম ঝুঁকি বা ঝামেলা ছাড়া সহজে অনলাইনে বিজনেস করুন ড্রপ শিপিং মডেলে।',
+        steps: [
+            { step: '১', title: '', description: 'সম্পূর্ণ ফ্রি তে রেজিস্ট্রেশন করুন আমাদের প্ল্যাটফর্মে আপনার পেজ অথবা শপ নাম দিয়ে।', active: true, order: 0 },
+            { step: '২', title: '', description: 'প্রোডাক্টের ছবি এবং ডেসক্রিপশন ডাউনলোড করে আপলোড করুন আপনার নিজস্ব পেজ অথবা ওয়েবসাইটে।', active: true, order: 1 },
+            { step: '৩', title: '', description: 'প্রোডাক্টগুলো ২০০-৩০০ টাকা প্রফিট রেখে সেল করুন অনলাইনে ডিজিটাল মার্কেটিং এর মাধ্যমে।', active: true, order: 2 },
+            { step: '৪', title: '', description: 'আপনার পাওয়া অর্ডারগুলো প্লেস করে দিন আমাদের অ্যাপসের মাধ্যমে কাস্টমারের নাম ঠিকানা দিয়ে।', active: true, order: 3 },
+            { step: '৫', title: '', description: 'আমাদের টিম আপনার অর্ডারটি আপনার শপের নামে ইনভয়েস করে পাঠিয়ে দিবে আপনার কাস্টমারের হাতে।', active: true, order: 4 },
+            { step: '৬', title: '', description: 'অর্ডারটি ডেলিভারি হওয়ার সাথে সাথেই প্রফিটের টাকা পেয়ে যাবেন আপনার দেওয়া বিকাশ, নগদ অথবা ব্যাংক অ্যাকাউন্টে।', active: true, order: 5 },
+        ],
+    },
+    experienceSection: {
+        enabled: true,
+        title: 'আমাদের এক্সপেরিয়েন্স',
+        subtitle: 'আমরা আমাদের অভিজ্ঞ টিমের মাধ্যমে অত্যন্ত সুনামের সাথে আমাদের সন্মানিত সেলারদের অর্ডার প্রসেস করে আসছি এছাড়াও আমাদের আরও রয়েছে…',
+        items: [
+            { icon: '📦', text: 'এক দিনে সর্বোচ্চ ৫০০০+ অর্ডার সহ মাসে ৭০,০০০ অর্ডার হ্যান্ডল করার অভিজ্ঞতা।', active: true, order: 0 },
+            { icon: '💰', text: 'আমাদের রয়েছে এক মাসে সর্বোচ্চ ৬০ লক্ষ+ টাকা রিসেলারদের প্রফিট দেওয়ার অভিজ্ঞতা।', active: true, order: 1 },
+            { icon: '🏆', text: 'সর্বোচ্চ পার্সেল ভলিউমের দিক দিয়ে স্টেডফাস্ট কুরিয়ারের ২য় স্থান অর্জনের অভিজ্ঞতা।', active: true, order: 2 },
+        ],
+    },
+    reviewsSection: {
+        enabled: true,
+        title: 'ড্রপশিপার রিভিউস',
+        subtitle: 'অসংখ্য সেলার ও ড্রপশিপার অত্যন্ত সন্তুষ্টির সাথে প্রায় তিন বছর যাবত আমাদের সাথে বিজনেস করে আসছেন। আপনাদের আস্থা ও সন্তুষ্টির কারণেই মাওয়া হোমবাজার বিডি আজ বাংলাদেশের অন্যতম সেরা ড্রপশিপিং প্ল্যাটফর্ম।',
+        items: [
+            { name: 'Sobuj Akon', designation: 'রিসেলার', avatar: '', rating: 5, text: 'এই প্ল্যাটফর্মে আমি বিগত ২ বছর ধরে কাজ করছি। পেমেন্ট সিস্টেম, স্টক সাপোর্ট, প্রোডাক্ট কোয়ালিটি এবং দ্রুত বুকিং সিস্টেম আমাকে ব্যবসায় প্রচুর সাফল্য অর্জনে সাহায্য করেছে। মাওয়া হোমবাজার বিডি আমার ব্যবসার জন্য একটি অমূল্য সম্পদ।', active: true, order: 0 },
+            { name: 'হৃদয়ে বাংলাদেশ', designation: 'ড্রপশিপার', avatar: '', rating: 5, text: 'আমি প্রায় তিন বছর ধরে মাওয়া হোমবাজার বিডিতে কাজ করছি। কোনো রকম পুঁজি বা ইনভেস্ট ছাড়াই একটা সেলস টিম তৈরি করে মাসে ৩০-৩৫ হাজার টাকা ইনকাম করছি। আপনাদের সার্ভিস ও সাপোর্ট সত্যিই অসাধারণ — একটা আস্থার প্ল্যাটফর্ম।', active: true, order: 1 },
+            { name: 'Salek Sakib', designation: 'রিসেলার', avatar: '', rating: 5, text: 'কোনো ধরনের ঝামেলা ছাড়াই আপনাদের প্রোডাক্ট নিয়ে বিজনেস করে আমি মাসে প্রায় ৭০ হাজার এবং সিজনে ১.৫ লক্ষ+ টাকা ইনকাম করছি। পরিবারের সাথে থেকে পরিবারের হাল ধরতে পেরে মাওয়া হোমবাজার বিডির প্রতি আমি চির কৃতজ্ঞ।', active: true, order: 2 },
+            { name: 'Raihanul Islam', designation: 'উদ্যোক্তা', avatar: '', rating: 5, text: 'বিজনেস করার মতো তেমন কিছুই ছিল না। ২০২৪ সালে আপনাদের প্রোডাক্ট নিয়ে বিজনেস শুরু করে নিজের একটি ছোট প্রতিষ্ঠান (১০ জন স্টাফ) তৈরি করতে পেরেছি। আপনাদের টিমের এই সাপোর্টের জন্য অসংখ্য ধন্যবাদ — আমরা এগিয়ে যেতে চাই আরও অনেকদূর।', active: true, order: 3 },
+            { name: 'Mahfuz Rahman', designation: 'ড্রপশিপার', avatar: '', rating: 5, text: '২০২৩ সালে স্টুডেন্ট অবস্থায় শুরু করেছিলাম, এখন পড়াশোনার পাশাপাশি প্রতি মাসে ৪০ হাজার+ টাকা ইনকাম করছি। প্রোডাক্ট কোয়ালিটি আর ডেলিভারি স্পিড দুটোই দারুণ। ধন্যবাদ মাওয়া হোমবাজার বিডি।', active: true, order: 4 },
+            { name: 'Nusrat Jahan', designation: 'রিসেলার', avatar: '', rating: 5, text: 'ঘরে বসে নিজের একটা অনলাইন শপ দাঁড় করাতে পেরেছি শুধু আপনাদের সাপোর্টের জন্য। রিটার্ন-রিফান্ড ঝামেলা প্রায় নেই বললেই চলে, আর কাস্টমাররাও সন্তুষ্ট। মেয়ে হিসেবে নিজের পায়ে দাঁড়ানোর আনন্দটাই আলাদা।', active: true, order: 5 },
+        ],
+    },
+};
+
 const SiteContentService = {
     // Get site content (creates default if not exists)
     async get() {
@@ -72,7 +175,30 @@ const SiteContentService = {
                     { slug: 'privacy', title: 'Privacy Policy', content: '<p>Please add your Privacy Policy content here.</p>', active: true },
                     { slug: 'refund', title: 'Refund Policy', content: '<p>Please add your Refund Policy content here.</p>', active: true },
                 ],
+                ...DEFAULT_HOME_SECTIONS,
             });
+        }
+
+        // Auto-migrate: back-fill new home sections for docs created before they existed.
+        // The block is skipped once every section is present, so it doesn't run twice.
+        if (!content.get('statsBar') || !content.get('aboutSection') || !content.get('servicesSection')
+            || !content.get('featuresSection') || !content.get('categoryShowcaseSection')
+            || !content.get('howItWorksSection') || !content.get('experienceSection')
+            || !content.get('reviewsSection')) {
+            const patch: any = {};
+            if (!content.get('statsBar'))               patch.statsBar               = DEFAULT_HOME_SECTIONS.statsBar;
+            if (!content.get('aboutSection'))           patch.aboutSection           = DEFAULT_HOME_SECTIONS.aboutSection;
+            if (!content.get('servicesSection'))        patch.servicesSection        = DEFAULT_HOME_SECTIONS.servicesSection;
+            if (!content.get('featuresSection'))        patch.featuresSection        = DEFAULT_HOME_SECTIONS.featuresSection;
+            if (!content.get('categoryShowcaseSection')) patch.categoryShowcaseSection = DEFAULT_HOME_SECTIONS.categoryShowcaseSection;
+            if (!content.get('howItWorksSection'))      patch.howItWorksSection      = DEFAULT_HOME_SECTIONS.howItWorksSection;
+            if (!content.get('experienceSection'))      patch.experienceSection      = DEFAULT_HOME_SECTIONS.experienceSection;
+            if (!content.get('reviewsSection'))         patch.reviewsSection         = DEFAULT_HOME_SECTIONS.reviewsSection;
+            content = await SiteContent.findOneAndUpdate(
+                { _key: 'main' },
+                { $set: patch },
+                { new: true }
+            );
         }
 
         // Auto-migrate: ensure legalPages exist and have real content

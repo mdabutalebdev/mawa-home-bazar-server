@@ -42,6 +42,12 @@ const CompanyController = {
 
     // ── Admin ────────────────────────────────────────
 
+    // POST /api/companies — admin creates a company + its owner login account
+    adminCreate: catchAsync(async (req: Request, res: Response) => {
+        const company = await CompanyService.adminCreate(req.body, req.user!.userId);
+        sendResponse(res, { statusCode: 201, success: true, message: 'Company created', data: company });
+    }),
+
     // GET /api/company?status=&q=&page=&limit=
     getAll: catchAsync(async (req: Request, res: Response) => {
         const result = await CompanyService.getAllCompanies(req.query);

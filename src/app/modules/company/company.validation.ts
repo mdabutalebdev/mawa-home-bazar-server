@@ -49,6 +49,22 @@ export const updateMyCompanyValidation = z.object({
     body: applyCompanyValidation.shape.body.partial(),
 });
 
+/**
+ * The admin creates a company directly (no application). It also provisions the
+ * owner's login account, so the owner-credential fields are required on top of
+ * the normal company fields, and the marketplace cut may be set at creation.
+ */
+export const adminCreateCompanyValidation = z.object({
+    body: applyCompanyValidation.shape.body.extend({
+        ownerFirstName: z.string().min(1, 'Owner first name is required').max(50),
+        ownerLastName: z.string().max(50).optional().default(''),
+        ownerEmail: z.string().email('A valid owner email is required'),
+        ownerPhone: z.string().optional().default(''),
+        ownerPassword: z.string().min(6, 'Owner password must be at least 6 characters'),
+        commissionRate: z.number().min(0).max(100).optional(),
+    }),
+});
+
 /** The owner's edit — same fields, plus the terms only they control. */
 export const updateCompanyValidation = z.object({
     body: applyCompanyValidation.shape.body.partial().extend({

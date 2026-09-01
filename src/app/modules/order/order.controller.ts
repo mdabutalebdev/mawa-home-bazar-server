@@ -16,7 +16,7 @@ const OrderController = {
 
     getById: catchAsync(async (req: Request, res: Response) => {
         // Admin AND super admin can view any order; everyone else is scoped to their own.
-        const isAdmin = req.user!.role === 'admin' || req.user!.role === 'superadmin';
+        const isAdmin = req.user!.role === 'admin';
         const order = await OrderService.getOrderById(req.params.id, isAdmin ? undefined : req.user!.userId);
         sendResponse(res, { statusCode: 200, success: true, message: 'Order fetched', data: order });
     }),

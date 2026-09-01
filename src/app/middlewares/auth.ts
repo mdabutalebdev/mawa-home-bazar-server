@@ -62,9 +62,9 @@ export const authMiddleware = async (
 
 export const authorizeRoles = (...allowedRoles: UserRole[]) => {
     return (req: Request, res: Response, next: NextFunction): void => {
-        // Superadmin is a superset of admin — it is always allowed on admin-scoped
-        // routes (so the super admin panel's API calls don't 403).
-        const allowed = !!req.user && (req.user.role === 'superadmin' || allowedRoles.includes(req.user.role));
+        // Admin is the single full-power role — always allowed on any authorized
+        // route (so the admin panel's API calls never 403).
+        const allowed = !!req.user && (req.user.role === 'admin' || allowedRoles.includes(req.user.role));
         if (!allowed) {
             throw new AppError(403, 'You do not have permission to perform this action.');
         }
@@ -74,27 +74,18 @@ export const authorizeRoles = (...allowedRoles: UserRole[]) => {
 
 /**
  * Permission-based authorization.
- * Passes if the user is a superadmin (bypasses all permission checks),
- * or an admin who holds EVERY listed permission.
- * Permissions are not in the JWT, so the user is fetched from the DB.
+ * There is one full-power `admin` role that holds every permission, so admin
+ * bypasses all permission checks; everyone else is denied.
  */
-export const authorizePermission = (...requiredPerms: string[]) => {
+export const authorizePermission = (..._requiredPerms: string[]) => {
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             if (!req.user) throw new AppError(401, 'You are not logged in. Please login to continue.');
 
-            // Superadmin bypasses all permission checks.
-            if (req.user.role === 'superadmin') return next();
+            // The single admin role bypasses all permission checks.
+            if (req.user.role === 'admin') return next();
 
-            const user = await User.findById(req.user.userId);
-            if (!user) throw new AppError(401, 'User belonging to this token no longer exists.');
-
-            const userPerms = user.permissions || [];
-            const hasAll = req.user.role === 'admin' && requiredPerms.every((p) => userPerms.includes(p));
-            if (!hasAll) {
-                throw new AppError(403, 'You do not have permission to perform this action.');
-            }
-            next();
+            throw new AppError(403, 'You do not have permission to perform this action.');
         } catch (error) {
             next(error);
         }

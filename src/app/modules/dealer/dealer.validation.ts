@@ -24,6 +24,34 @@ export const updateMyDealerValidation = z.object({
     body: applyDealerValidation.shape.body.omit({ upazila: true }).partial(),
 });
 
+/**
+ * The admin creates a dealer directly (no application). It also provisions the
+ * owner's login account, so the owner-credential fields are required on top of
+ * the normal dealer fields, and the commission may be set at creation.
+ */
+export const adminCreateDealerValidation = z.object({
+    body: applyDealerValidation.shape.body
+        .omit({ upazila: true })
+        .extend({
+            // Upazila dealer covers one upazila; district dealer covers a whole
+            // district (the fallback). Exactly one territory field is required,
+            // enforced by the refine below.
+            level: z.enum(['upazila', 'district']).optional().default('upazila'),
+            upazila: objectId.optional(),
+            district: objectId.optional(),
+            ownerFirstName: z.string().min(1, 'Owner first name is required').max(50),
+            ownerLastName: z.string().max(50).optional().default(''),
+            ownerEmail: z.string().email('A valid owner email is required'),
+            ownerPhone: z.string().optional().default(''),
+            ownerPassword: z.string().min(6, 'Owner password must be at least 6 characters'),
+            commissionRate: z.number().min(0).max(100).optional(),
+        })
+        .refine((d) => (d.level === 'district' ? !!d.district : !!d.upazila), {
+            message: 'Pick an upazila for an upazila dealer, or a district for a district dealer.',
+            path: ['upazila'],
+        }),
+});
+
 export const approveDealerValidation = z.object({
     body: z.object({
         commissionRate: z.number().min(0).max(100).optional(),

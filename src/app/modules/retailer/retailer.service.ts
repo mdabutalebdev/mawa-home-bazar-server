@@ -62,7 +62,7 @@ const RetailerService = {
         // stays 'pending' and the route layer blocks trading until it is approved.
         // Admins keep their own role — applying must never demote them.
         await User.updateOne(
-            { _id: userId, role: { $nin: ['admin', 'superadmin'] } },
+            { _id: userId, role: { $nin: ['admin'] } },
             { $set: { role: 'retailer' } }
         );
 

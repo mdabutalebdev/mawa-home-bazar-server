@@ -23,6 +23,13 @@ const DealerController = {
     }),
 
     // ── Admin ────────────────────────────────────────
+
+    // POST /api/dealers — admin creates a dealer + its owner login account
+    adminCreate: catchAsync(async (req: Request, res: Response) => {
+        const dealer = await DealerService.adminCreate(req.body, req.user!.userId);
+        sendResponse(res, { statusCode: 201, success: true, message: 'Dealer created', data: dealer });
+    }),
+
     getAll: catchAsync(async (req: Request, res: Response) => {
         const { dealers, meta } = await DealerService.getAllDealers(req.query as Record<string, unknown>);
         sendResponse(res, { statusCode: 200, success: true, message: 'Dealers fetched', data: dealers, meta });

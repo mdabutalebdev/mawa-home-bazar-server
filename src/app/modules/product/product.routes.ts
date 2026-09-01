@@ -26,9 +26,9 @@ router.delete('/company/my/:id', authMiddleware, authorizeRoles('company'), Prod
 router.get('/wholesale', authMiddleware, authorizeRoles('retailer'), ProductCompanyController.wholesale);
 
 // ── Owner moderation of company listings ────────────────────────
-router.get('/moderation', authMiddleware, authorizeRoles('admin', 'superadmin'), ProductCompanyController.listForModeration);
-router.patch('/moderation/:id/approve', authMiddleware, authorizeRoles('admin', 'superadmin'), ProductCompanyController.approve);
-router.patch('/moderation/:id/reject', authMiddleware, authorizeRoles('admin', 'superadmin'), ProductCompanyController.reject);
+router.get('/moderation', authMiddleware, authorizeRoles('admin'), ProductCompanyController.listForModeration);
+router.patch('/moderation/:id/approve', authMiddleware, authorizeRoles('admin'), ProductCompanyController.approve);
+router.patch('/moderation/:id/reject', authMiddleware, authorizeRoles('admin'), ProductCompanyController.reject);
 router.patch('/:id/stat', ProductController.incrementStat);
 router.get('/:id/related/:categoryId', ProductController.getRelated);
 router.get('/:id', ProductController.getById);

@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/webhook', CourierController.webhook);
 
 // ── Admin / super admin: Steadfast courier management ──
-const admin = [authMiddleware, authorizeRoles('admin', 'superadmin')];
+const admin = [authMiddleware, authorizeRoles('admin')];
 
 // Shipments board — flat order list with state filters.
 router.get('/orders', ...admin, CourierController.listOrders);

@@ -13,7 +13,7 @@ router.post('/deposit', WalletController.deposit);
 router.post('/withdraw', WalletController.withdraw);
 
 // ── Owner ───────────────────────────────────────────
-const owner = [authorizeRoles('admin', 'superadmin')];
+const owner = [authorizeRoles('admin')];
 router.get('/requests', ...owner, WalletController.listRequests);
 router.patch('/requests/:id/approve', ...owner, WalletController.approve);
 router.patch('/requests/:id/reject', ...owner, WalletController.reject);

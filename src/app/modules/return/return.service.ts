@@ -58,7 +58,7 @@ const ReturnService = {
             const returnIdStr = doc._id.toString();
 
             const fanOut = async () => {
-                const admins = await User.find({ role: { $in: ['admin', 'superadmin'] } }).select('_id');
+                const admins = await User.find({ role: { $in: ['admin'] } }).select('_id');
                 for (const admin of admins) {
                     await NotificationService.notify({
                         user: admin._id,
@@ -91,7 +91,7 @@ const ReturnService = {
         const isOwner = (doc.user as any)?._id
             ? (doc.user as any)._id.toString() === requester.userId
             : doc.user.toString() === requester.userId;
-        const isAdmin = requester.role === 'admin' || requester.role === 'superadmin';
+        const isAdmin = requester.role === 'admin';
 
         if (!isOwner && !isAdmin) {
             throw new AppError(403, 'You do not have permission to view this return request');

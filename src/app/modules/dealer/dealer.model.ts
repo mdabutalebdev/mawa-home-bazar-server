@@ -21,8 +21,24 @@ const dealerSchema = new Schema(
         address: { type: String, required: true, trim: true, maxlength: 300 },
 
         // ── Territory ────────────────────────────────
-        upazila: { type: Schema.Types.ObjectId, ref: 'Upazila', required: true },
-        district: { type: Schema.Types.ObjectId, ref: 'District', default: null },
+        // A dealer covers EITHER one upazila ('upazila' level) OR a whole
+        // district ('district' level). District dealers are the fallback: an
+        // order routes to the buyer's own upazila dealer if one exists, else to
+        // the district dealer covering that upazila's district, else nobody
+        // (the admin supervises it directly).
+        level: { type: String, enum: ['upazila', 'district'], default: 'upazila' },
+        upazila: {
+            type: Schema.Types.ObjectId, ref: 'Upazila',
+            // Required for an upazila-level dealer; a district dealer leaves it blank.
+            required: function (this: any) { return this.level !== 'district'; },
+            default: null,
+        },
+        district: {
+            type: Schema.Types.ObjectId, ref: 'District',
+            // Required for a district-level dealer; kept (denormalised) for upazila ones too.
+            required: function (this: any) { return this.level === 'district'; },
+            default: null,
+        },
         division: { type: Schema.Types.ObjectId, ref: 'Division', default: null },
 
         // ── Verification documents ───────────────────
@@ -56,13 +72,17 @@ const dealerSchema = new Schema(
     { timestamps: true, toJSON: { virtuals: true } }
 );
 
-// The one-dealer-per-upazila rule. A partial index so rejected/suspended
-// applications for the same area do not collide with the live one.
+// One approved dealer per upazila (upazila-level). Partial, so rejected/
+// suspended applications for the same area do not collide with the live one.
 dealerSchema.index(
     { upazila: 1 },
-    { unique: true, partialFilterExpression: { status: 'approved' } }
+    { unique: true, partialFilterExpression: { status: 'approved', level: 'upazila' } }
+);
+// One approved dealer per district (district-level fallback).
+dealerSchema.index(
+    { district: 1 },
+    { unique: true, partialFilterExpression: { status: 'approved', level: 'district' } }
 );
 dealerSchema.index({ status: 1 });
-dealerSchema.index({ district: 1 });
 
 export const Dealer = model('Dealer', dealerSchema);

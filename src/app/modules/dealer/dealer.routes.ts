@@ -4,6 +4,7 @@ import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import {
     applyDealerValidation,
+    adminCreateDealerValidation,
     updateMyDealerValidation,
     approveDealerValidation,
     rejectDealerValidation,
@@ -24,11 +25,12 @@ router.get('/me', authMiddleware, DealerController.getMe);
 router.patch('/me', authMiddleware, validateRequest(updateMyDealerValidation), DealerController.updateMe);
 
 // ── Admin ────────────────────────────────────────────
-router.get('/', authMiddleware, authorizeRoles('admin', 'superadmin'), DealerController.getAll);
-router.patch('/:id/approve', authMiddleware, authorizeRoles('admin', 'superadmin'), validateRequest(approveDealerValidation), DealerController.approve);
-router.patch('/:id/reject', authMiddleware, authorizeRoles('admin', 'superadmin'), validateRequest(rejectDealerValidation), DealerController.reject);
-router.patch('/:id/suspend', authMiddleware, authorizeRoles('admin', 'superadmin'), validateRequest(suspendDealerValidation), DealerController.suspend);
-router.get('/:id', authMiddleware, authorizeRoles('admin', 'superadmin'), DealerController.getById);
-router.patch('/:id', authMiddleware, authorizeRoles('admin', 'superadmin'), validateRequest(updateDealerValidation), DealerController.update);
+router.post('/', authMiddleware, authorizeRoles('admin'), validateRequest(adminCreateDealerValidation), DealerController.adminCreate);
+router.get('/', authMiddleware, authorizeRoles('admin'), DealerController.getAll);
+router.patch('/:id/approve', authMiddleware, authorizeRoles('admin'), validateRequest(approveDealerValidation), DealerController.approve);
+router.patch('/:id/reject', authMiddleware, authorizeRoles('admin'), validateRequest(rejectDealerValidation), DealerController.reject);
+router.patch('/:id/suspend', authMiddleware, authorizeRoles('admin'), validateRequest(suspendDealerValidation), DealerController.suspend);
+router.get('/:id', authMiddleware, authorizeRoles('admin'), DealerController.getById);
+router.patch('/:id', authMiddleware, authorizeRoles('admin'), validateRequest(updateDealerValidation), DealerController.update);
 
 export const DealerRoutes = router;

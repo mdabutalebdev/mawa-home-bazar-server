@@ -4,6 +4,7 @@ import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import {
     applyCompanyValidation,
+    adminCreateCompanyValidation,
     updateMyCompanyValidation,
     updateCompanyValidation,
     rejectCompanyValidation,
@@ -22,11 +23,12 @@ router.get('/me', authMiddleware, CompanyController.getMe);
 router.patch('/me', authMiddleware, validateRequest(updateMyCompanyValidation), CompanyController.updateMe);
 
 // Admin
-router.get('/', authMiddleware, authorizeRoles('admin', 'superadmin'), CompanyController.getAll);
-router.get('/:id', authMiddleware, authorizeRoles('admin', 'superadmin'), CompanyController.getById);
-router.patch('/:id/approve', authMiddleware, authorizeRoles('admin', 'superadmin'), CompanyController.approve);
-router.patch('/:id/reject', authMiddleware, authorizeRoles('admin', 'superadmin'), validateRequest(rejectCompanyValidation), CompanyController.reject);
-router.patch('/:id/suspend', authMiddleware, authorizeRoles('admin', 'superadmin'), CompanyController.suspend);
-router.patch('/:id', authMiddleware, authorizeRoles('admin', 'superadmin'), validateRequest(updateCompanyValidation), CompanyController.update);
+router.post('/', authMiddleware, authorizeRoles('admin'), validateRequest(adminCreateCompanyValidation), CompanyController.adminCreate);
+router.get('/', authMiddleware, authorizeRoles('admin'), CompanyController.getAll);
+router.get('/:id', authMiddleware, authorizeRoles('admin'), CompanyController.getById);
+router.patch('/:id/approve', authMiddleware, authorizeRoles('admin'), CompanyController.approve);
+router.patch('/:id/reject', authMiddleware, authorizeRoles('admin'), validateRequest(rejectCompanyValidation), CompanyController.reject);
+router.patch('/:id/suspend', authMiddleware, authorizeRoles('admin'), CompanyController.suspend);
+router.patch('/:id', authMiddleware, authorizeRoles('admin'), validateRequest(updateCompanyValidation), CompanyController.update);
 
 export const CompanyRoutes = router;

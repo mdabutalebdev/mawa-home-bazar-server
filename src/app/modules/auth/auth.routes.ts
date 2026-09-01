@@ -19,6 +19,6 @@ router.post('/reset-password', validateRequest(resetPasswordValidation), AuthCon
 router.post('/update-password', authMiddleware, validateRequest(updatePasswordValidation), AuthController.updatePassword);
 router.get('/me', authMiddleware, AuthController.getMe);
 router.post('/logout', AuthController.logout);
-router.post('/login-as/:userId', authMiddleware, authorizeRoles('admin', 'superadmin'), AuthController.loginAs);
+router.post('/login-as/:userId', authMiddleware, authorizeRoles('admin'), AuthController.loginAs);
 
 export const AuthRoutes = router;

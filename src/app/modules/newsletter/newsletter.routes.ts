@@ -8,6 +8,6 @@ const router = express.Router();
 router.post('/subscribe', NewsletterController.subscribe);
 
 // ADMIN — list subscribers.
-router.get('/', authMiddleware, authorizeRoles('admin', 'superadmin'), NewsletterController.getAll);
+router.get('/', authMiddleware, authorizeRoles('admin'), NewsletterController.getAll);
 
 export const NewsletterRoutes = router;

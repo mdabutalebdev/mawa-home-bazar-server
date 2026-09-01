@@ -76,7 +76,12 @@ const AuthService = {
     },
 
     async register(payload: any): Promise<IAuthResponse & { verifyLink?: string }> {
-        const { firstName, lastName, email, phone, password, location, referralCode } = payload;
+        const { firstName, lastName, email, phone, password, location, referralCode, role } = payload;
+
+        // Whitelist the self-signup role. Only a plain customer or a retailer may
+        // be chosen at registration; everything else (admin/company/dealer) is
+        // assigned elsewhere, so it can never be claimed by a public signup.
+        const signupRole = role === 'retailer' ? 'retailer' : 'user';
 
         // Auto-generate guest email if only phone provided
         const userEmail = email || `${phone?.replace(/\s+/g, '')}@guest.mawahomebazarbd.com`;
@@ -106,6 +111,7 @@ const AuthService = {
             phone: phone || '',
             password,
             location: location || '',
+            role: signupRole,
             status: 'active',
             isEmailVerified: false,
             referralCode: await this.generateReferralCode(firstName),

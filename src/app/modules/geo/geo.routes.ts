@@ -13,6 +13,6 @@ router.get('/upazilas/:id', GeoController.getUpazila);
 router.get('/coverage', GeoController.getCoverage);
 
 // Admin
-router.post('/reseed', authMiddleware, authorizeRoles('admin', 'superadmin'), GeoController.reseed);
+router.post('/reseed', authMiddleware, authorizeRoles('admin'), GeoController.reseed);
 
 export const GeoRoutes = router;

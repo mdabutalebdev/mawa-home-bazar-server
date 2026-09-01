@@ -41,6 +41,32 @@ const CategoryController = {
         await CategoryService.deleteCategory(req.params.id);
         sendResponse(res, { statusCode: 200, success: true, message: 'Category deleted' });
     }),
+
+    // ── Company-scoped (seller uploads products into these) ──
+    getForSeller: catchAsync(async (req: Request, res: Response) => {
+        const categories = await CategoryService.getCategoriesForSeller(req.user!.userId, req.user!.role);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Categories fetched', data: categories });
+    }),
+
+    getMyCompanyCategories: catchAsync(async (req: Request, res: Response) => {
+        const categories = await CategoryService.getMyCompanyCategories(req.user!.userId);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Your categories fetched', data: categories });
+    }),
+
+    createCompanyCategory: catchAsync(async (req: Request, res: Response) => {
+        const category = await CategoryService.createCompanyCategory(req.user!.userId, req.body);
+        sendResponse(res, { statusCode: 201, success: true, message: 'Category created', data: category });
+    }),
+
+    updateCompanyCategory: catchAsync(async (req: Request, res: Response) => {
+        const category = await CategoryService.updateCompanyCategory(req.user!.userId, req.params.id, req.body);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Category updated', data: category });
+    }),
+
+    deleteCompanyCategory: catchAsync(async (req: Request, res: Response) => {
+        await CategoryService.deleteCompanyCategory(req.user!.userId, req.params.id);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Category deleted' });
+    }),
 };
 
 export default CategoryController;

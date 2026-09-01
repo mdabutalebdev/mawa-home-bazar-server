@@ -1,5 +1,19 @@
 import { Schema, model } from 'mongoose';
 
+/**
+ * Bilingual string shape — `{ en, bn }` — used by the six admin-managed
+ * landing sections so a single site content document carries both languages
+ * and the frontend can switch instantly without a re-fetch.
+ *
+ * Written as a factory (not a shared sub-schema) because Mongoose's typegen
+ * infers a self-referential type when a shared `Schema` is used as a nested
+ * field `type`, which fails to compile.
+ */
+const bi = () => ({
+    en: { type: String, default: '' },
+    bn: { type: String, default: '' },
+});
+
 // ── Ticker Item ──
 const tickerItemSchema = new Schema({
     text: { type: String, required: true },
@@ -18,6 +32,10 @@ const socialLinkSchema = new Schema({
     label: { type: String, required: true },
     url: { type: String, default: '#' },
     color: { type: String, default: '#000000' },
+    // When false the icon is hidden in the footer. When true it shows even
+    // if the URL is still blank — the admin controls visibility with this
+    // toggle, not by whether a link has been filled in yet.
+    active: { type: Boolean, default: true },
 }, { _id: true });
 
 // ── Main Site Content Schema ──
@@ -149,6 +167,123 @@ const siteContentSchema = new Schema({
         align: { type: String, enum: ['left', 'center', 'right'], default: 'left' },
         textTone: { type: String, enum: ['light', 'dark'], default: 'light' },
         scrim: { type: Boolean, default: true },
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // ── Homepage Landing Sections (admin-editable) ──
+    // Each section is toggled with `enabled` — turning it off hides the whole
+    // block on the homepage without needing to touch the code.
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // ── Stats Bar — highlight tiles under the hero.
+    statsBar: {
+        enabled: { type: Boolean, default: true },
+        items: [{
+            value: { type: String, default: '' },       // "2,00,000+" — same both languages
+            label: bi(),
+            icon:  { type: String, default: '' },
+            active: { type: Boolean, default: true },
+            order:  { type: Number, default: 0 },
+        }],
+    },
+
+    // ── About Section
+    aboutSection: {
+        enabled: { type: Boolean, default: true },
+        title:       bi(),
+        description: bi(),
+        imageUrl: { type: String, default: '' },
+        ctaLabel:    bi(),
+        ctaHref: { type: String, default: '/about' },
+    },
+
+    // ── Services Section
+    // Now an image-card grid: each card leads to the service-request form. The
+    // image is the card's face; title/description are optional (an image-only
+    // card is valid). `icon` is kept for backward-compat / fallback.
+    servicesSection: {
+        enabled: { type: Boolean, default: true },
+        title:    bi(),
+        subtitle: bi(),
+        items: [{
+            image: { type: String, default: '' },   // card image (primary)
+            icon: { type: String, default: '' },     // legacy emoji/icon fallback
+            title:       bi(),
+            description: bi(),
+            link: { type: String, default: '' },      // optional external override; blank = request form
+            active: { type: Boolean, default: true },
+            order: { type: Number, default: 0 },
+        }],
+    },
+
+    // ── Features Section
+    featuresSection: {
+        enabled: { type: Boolean, default: true },
+        title:    bi(),
+        subtitle: bi(),
+        items: [{
+            icon: { type: String, default: '' },
+            title:       bi(),
+            description: bi(),
+            active: { type: Boolean, default: true },
+            order: { type: Number, default: 0 },
+        }],
+    },
+
+    // ── Category Showcase Section
+    categoryShowcaseSection: {
+        enabled: { type: Boolean, default: true },
+        title:    bi(),
+        subtitle: bi(),
+        showCount: { type: Number, default: 60 },
+        onlyHome: { type: Boolean, default: false },
+    },
+
+    // ── How It Works Section
+    howItWorksSection: {
+        enabled: { type: Boolean, default: true },
+        title:    bi(),
+        subtitle: bi(),
+        steps: [{
+            step: { type: String, default: '' },       // shared symbol/number
+            title:       bi(),
+            description: bi(),
+            active: { type: Boolean, default: true },
+            order: { type: Number, default: 0 },
+        }],
+    },
+
+    // ── Experience Section
+    experienceSection: {
+        enabled: { type: Boolean, default: true },
+        title:    bi(),
+        subtitle: bi(),
+        items: [{
+            icon: { type: String, default: '✅' },
+            text: bi(),
+            active: { type: Boolean, default: true },
+            order: { type: Number, default: 0 },
+        }],
+    },
+
+    // ── Reviews Section (dropshipper testimonials — admin managed)
+    // Testimonials are real people's quotes, so name / role / text are plain
+    // single-language strings (not bilingual); only the section heading switches
+    // language. `rating` is 1–5 stars; `avatar` is an optional uploaded photo,
+    // falling back to the person's initials when blank.
+    reviewsSection: {
+        enabled: { type: Boolean, default: true },
+        title:    bi(),
+        subtitle: bi(),
+        items: [{
+            name: { type: String, default: '' },
+            designation: { type: String, default: '' },
+            avatar: { type: String, default: '' },
+            rating: { type: Number, default: 5, min: 0, max: 5 },
+            text: { type: String, default: '' },
+            active: { type: Boolean, default: true },
+            order: { type: Number, default: 0 },
+        }],
     },
 
 }, { timestamps: true });

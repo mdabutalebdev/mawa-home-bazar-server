@@ -40,16 +40,17 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
         avatar: { type: String, default: '' },
 
         // ── Role & Status ────────────────────────────
-        // A user has exactly one role. The marketplace roles each own a profile
-        // document (Company / Dealer / Retailer / MarketingOfficer / DeliveryMan)
-        // that carries their business details and approval state — the role here
-        // only decides which dashboard and which API scope they get.
+        // A user has exactly one role. The marketplace partner roles each own a
+        // profile document (Company / Dealer / Retailer) that carries their
+        // business details and approval state — the role here only decides which
+        // dashboard and which API scope they get. `admin` is the single
+        // full-power role that runs the platform.
         role: {
             type: String,
             enum: {
                 values: [
-                    'superadmin', 'admin', 'user',
-                    'company', 'dealer', 'retailer', 'marketing_officer', 'delivery_man',
+                    'admin', 'user',
+                    'company', 'dealer', 'retailer',
                 ],
                 message: '{VALUE} is not a valid role',
             },

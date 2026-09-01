@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { Dealer } from '../dealer/dealer.model';
 import { Company } from '../company/company.model';
 import { User } from '../user/user.model';
+import { Upazila } from '../geo/geo.model';
 
 /**
  * Order routing — who fulfils an order, and who supervises it.
@@ -26,13 +27,37 @@ const idStr = (v: unknown): string =>
         : String(v ?? '');
 
 /**
- * The dealer covering an upazila, or null where the marketplace has no
- * presence yet. "No dealer here" is an ordinary state — the order still goes
- * through, the owner just supervises it directly.
+ * The dealer who supervises an order placed in a given upazila.
+ *
+ * Two tiers, checked in order:
+ *   1. the dealer bound to that exact **upazila**, if one exists;
+ *   2. otherwise the **district**-level dealer covering that upazila's district
+ *      (the fallback the owner asked for).
+ * If neither exists it returns null — an ordinary state, the order still goes
+ * through and the admin supervises it directly.
  */
 export const findDealerForUpazila = async (upazilaId?: unknown) => {
     if (!upazilaId) return null;
-    return Dealer.findOne({ upazila: upazilaId, status: 'approved' }).select('_id commissionRate homeDelivery');
+
+    // 1) A dealer bound to this exact upazila. `level` may be absent on dealers
+    //    created before the field existed, so match "not a district dealer".
+    const upazilaDealer = await Dealer.findOne({
+        upazila: upazilaId,
+        status: 'approved',
+        level: { $ne: 'district' },
+    }).select('_id commissionRate homeDelivery');
+    if (upazilaDealer) return upazilaDealer;
+
+    // 2) Fallback: the district-level dealer for this upazila's district.
+    const up = await Upazila.findById(upazilaId).select('district').lean();
+    if (up && (up as any).district) {
+        return Dealer.findOne({
+            district: (up as any).district,
+            level: 'district',
+            status: 'approved',
+        }).select('_id commissionRate homeDelivery');
+    }
+    return null;
 };
 
 /**

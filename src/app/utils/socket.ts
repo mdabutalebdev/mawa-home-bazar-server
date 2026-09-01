@@ -52,9 +52,9 @@ export const initSocket = (httpServer: HttpServer): SocketIOServer => {
         if (userId) {
             socket.join('user:' + userId);
         }
-        // Admins/superadmins also join a shared room for live business/finance pushes.
+        // Admins also join a shared room for live business/finance pushes.
         const role = socket.data.role as string;
-        if (role === 'admin' || role === 'superadmin') {
+        if (role === 'admin') {
             socket.join('admins');
         }
 
