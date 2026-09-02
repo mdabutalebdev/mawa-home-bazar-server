@@ -22,10 +22,22 @@ const OrderRequestController = {
         sendResponse(res, { statusCode: 200, success: true, message: 'Counts', data: counts });
     }),
 
+    // GET /api/order-requests/dealer/:id — Dealer
+    getSingleForDealer: catchAsync(async (req: Request, res: Response) => {
+        const result = await OrderRequestService.getSingleForDealer(req.params.id, req.user!.userId);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Request fetched', data: result });
+    }),
+
     // GET /api/order-requests/admin — Admin
     getAllAdmin: catchAsync(async (req: Request, res: Response) => {
         const result = await OrderRequestService.getAllAdmin(req.query);
         sendResponse(res, { statusCode: 200, success: true, message: 'Requests fetched', data: result.data, meta: result.meta });
+    }),
+
+    // GET /api/order-requests/admin/:id — Admin
+    getSingleAdmin: catchAsync(async (req: Request, res: Response) => {
+        const result = await OrderRequestService.getSingleAdmin(req.params.id);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Request fetched', data: result });
     }),
 
     // PATCH /api/order-requests/:id/status — Dealer (own) or Admin

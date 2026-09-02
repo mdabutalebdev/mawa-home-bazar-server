@@ -51,6 +51,9 @@ const productSchema = new Schema(
         // bucket, which is why this is nullable rather than required.
         company: { type: Schema.Types.ObjectId, ref: 'Company', default: null },
 
+        // If this product is a specific service offering, it links to a CompanyService
+        serviceId: { type: Schema.Types.ObjectId, ref: 'CompanyService', default: null },
+
         // A company's listing is not visible until the owner passes it. Products
         // the owner creates skip straight to 'approved' (see the service).
         approvalStatus: {

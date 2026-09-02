@@ -79,11 +79,27 @@ const OrderRequestService = {
         return this._list(filter, query);
     },
 
+    /** Dealer: single request */
+    async getSingleForDealer(id: string, userId: string) {
+        const dealer = await Dealer.findOne({ user: userId }).select('_id').lean();
+        if (!dealer) throw new AppError(404, 'No dealer profile linked.');
+        const request = await populateAll(OrderRequest.findOne({ _id: id, dealer: (dealer as any)._id })).lean();
+        if (!request) throw new AppError(404, 'Request not found or not assigned to you.');
+        return request;
+    },
+
     /** Admin: every request. */
     async getAllAdmin(query: Payload) {
         const filter: Payload = {};
         if (query.status) filter.status = query.status;
         return this._list(filter, query);
+    },
+
+    /** Admin: single request. */
+    async getSingleAdmin(id: string) {
+        const request = await populateAll(OrderRequest.findById(id)).lean();
+        if (!request) throw new AppError(404, 'Request not found.');
+        return request;
     },
 
     /** Small counts for a dashboard badge. */
@@ -110,6 +126,11 @@ const OrderRequestService = {
         }
         if (payload.status) request.status = payload.status;
         if (payload.dealerNote !== undefined) request.dealerNote = String(payload.dealerNote);
+        if (role === 'admin') {
+            if (payload.name !== undefined) request.name = String(payload.name);
+            if (payload.phone !== undefined) request.phone = String(payload.phone);
+            if (payload.address !== undefined) request.address = String(payload.address);
+        }
         await request.save();
         return request;
     },

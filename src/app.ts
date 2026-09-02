@@ -38,6 +38,7 @@ import { CompanyRoutes } from './app/modules/company/company.routes';
 import { RetailerRoutes } from './app/modules/retailer/retailer.routes';
 import { ChatRoutes } from './app/modules/chat/chat.routes';
 import { WalletRoutes } from './app/modules/wallet/wallet.routes';
+import { CompanyServiceRoutes } from './app/modules/companyService/companyService.routes';
 
 const app: Application = express();
 
@@ -118,6 +119,7 @@ app.use('/api/companies', CompanyRoutes);
 app.use('/api/retailers', RetailerRoutes);
 app.use('/api/chat', ChatRoutes);
 app.use('/api/wallet', WalletRoutes);
+app.use('/api/company-services', CompanyServiceRoutes);
 
 // ── Error Handlers ────────────────────────────────────────────────
 app.use(notFoundHandler);
