@@ -26,7 +26,7 @@ const DEFAULT_HOME_SECTIONS = {
     },
     servicesSection: {
         enabled: true,
-        title: 'আমাদের সার্ভিস সমূহ',
+        title: 'ঘরেবসে পন্যসামগ্রিই ও সর্ভিস সমূহ অর্ডার করুন দ্রুত পৌচে দিবো আপনার হতে।',
         subtitle: 'আমাদের এই প্লাটফর্মের মাধ্যমে আপনি পাচ্ছেন অসংখ্য বিজনেস এবং ইনকাম করার সুযোগ।',
         items: [
             { icon: '🛍️', title: 'রিসেলিং / ড্রপশিপিং',   description: '', link: '', active: true, order: 0 },
