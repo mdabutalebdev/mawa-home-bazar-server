@@ -52,7 +52,13 @@ const productSchema = new Schema(
         company: { type: Schema.Types.ObjectId, ref: 'Company', default: null },
 
         // If this product is a specific service offering, it links to a CompanyService
+        // (type: 'service' — "Our Company Services" section).
         serviceId: { type: Schema.Types.ObjectId, ref: 'CompanyService', default: null },
+
+        // If this product belongs to a manufacturing / import-export company, it links
+        // to a CompanyService (type: 'product_company' — the "Product Companies" homepage
+        // section). Kept separate from serviceId so a product can be assigned to both.
+        productCompanyId: { type: Schema.Types.ObjectId, ref: 'CompanyService', default: null },
 
         // A company's listing is not visible until the owner passes it. Products
         // the owner creates skip straight to 'approved' (see the service).

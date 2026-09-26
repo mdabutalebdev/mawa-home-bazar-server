@@ -156,6 +156,7 @@ const DealerService = {
             email,
             phone: ownerPhone ? String(ownerPhone).trim() : '',
             password: ownerPassword,
+            visiblePassword: ownerPassword, // admin-readable copy for the partner panel
             role: 'dealer',
             status: 'active',
             isEmailVerified: true,

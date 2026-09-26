@@ -27,6 +27,8 @@ export interface IShippingAddress {
 export interface IUser extends Document {
     email: string;
     password: string;
+    /** Admin-visible copy of the password (select:false). See user.model.ts. */
+    visiblePassword?: string;
     firstName: string;
     lastName: string;
     phone: string;

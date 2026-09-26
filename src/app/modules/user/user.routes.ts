@@ -30,6 +30,8 @@ router.get('/admin/all', authMiddleware, authorizeRoles('admin'), UserController
 router.get('/admin/stats', authMiddleware, authorizeRoles('admin'), UserController.getAdminStats);
 router.get('/admin/:id', authMiddleware, authorizeRoles('admin'), UserController.getUserById);
 router.patch('/admin/:id', authMiddleware, authorizeRoles('admin'), UserController.adminUpdateUser);
+router.get('/admin/:id/credentials', authMiddleware, authorizeRoles('admin'), UserController.getUserCredentials);
+router.patch('/admin/:id/credentials', authMiddleware, authorizeRoles('admin'), UserController.adminUpdateCredentials);
 router.patch('/admin/:id/status', authMiddleware, authorizeRoles('admin'), validateRequest(updateStatusValidation), UserController.updateUserStatus);
 router.delete('/admin/:id', authMiddleware, authorizeRoles('admin'), UserController.deleteUser);
 

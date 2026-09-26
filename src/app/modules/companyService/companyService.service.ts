@@ -2,20 +2,35 @@ import { CompanyService } from './companyService.model';
 import { Product } from '../product/product.model';
 import AppError from '../../utils/AppError';
 
-// Attach real-time product counts to each service
+// Attach real-time product counts to each service/company.
+// Service-type companies count products linked via `serviceId`; product-company-type
+// companies count products linked via `productCompanyId`. Both are computed so the
+// homepage badges and storefront listings stay accurate for either kind.
 const attachProductCounts = async (services: any[]) => {
-    const counts = await Product.aggregate([
-        { $match: { isDeleted: false, status: 'active', serviceId: { $ne: null } } },
-        { $group: { _id: '$serviceId', count: { $sum: 1 } } },
+    const [serviceCounts, productCompanyCounts] = await Promise.all([
+        Product.aggregate([
+            { $match: { isDeleted: false, status: 'active', serviceId: { $ne: null } } },
+            { $group: { _id: '$serviceId', count: { $sum: 1 } } },
+        ]),
+        Product.aggregate([
+            { $match: { isDeleted: false, status: 'active', productCompanyId: { $ne: null } } },
+            { $group: { _id: '$productCompanyId', count: { $sum: 1 } } },
+        ]),
     ]);
-    const countMap: Record<string, number> = {};
-    counts.forEach((c: any) => { if (c._id) countMap[String(c._id)] = c.count; });
 
-    return services.map((srv: any) => ({
-        ...srv,
-        id: String(srv._id),
-        productCount: countMap[String(srv._id)] || 0,
-    }));
+    const serviceMap: Record<string, number> = {};
+    serviceCounts.forEach((c: any) => { if (c._id) serviceMap[String(c._id)] = c.count; });
+    const productCompanyMap: Record<string, number> = {};
+    productCompanyCounts.forEach((c: any) => { if (c._id) productCompanyMap[String(c._id)] = c.count; });
+
+    return services.map((srv: any) => {
+        const map = srv.type === 'product_company' ? productCompanyMap : serviceMap;
+        return {
+            ...srv,
+            id: String(srv._id),
+            productCount: map[String(srv._id)] || 0,
+        };
+    });
 };
 
 const CompanyServiceService = {
@@ -82,10 +97,12 @@ const CompanyServiceService = {
         const service = await CompanyService.findById(id);
         if (!service) throw new AppError(404, 'Service not found');
 
-        // Check if products exist for this service
-        const productCount = await Product.countDocuments({ serviceId: id, isDeleted: false });
+        // Check if products exist for this service/company. Service-type links via
+        // serviceId; product-company-type links via productCompanyId — block on either.
+        const linkField = service.type === 'product_company' ? 'productCompanyId' : 'serviceId';
+        const productCount = await Product.countDocuments({ [linkField]: id, isDeleted: false });
         if (productCount > 0) {
-            throw new AppError(400, 'Cannot delete service that has active products. Reassign or delete products first.');
+            throw new AppError(400, 'Cannot delete a company that has active products. Reassign or delete those products first.');
         }
 
         await CompanyService.findByIdAndDelete(id);

@@ -41,6 +41,18 @@ const UserController = {
         sendResponse(res, { statusCode: 200, success: true, message: 'User updated successfully', data: user });
     }),
 
+    // PATCH /api/users/admin/:id/credentials (admin) — change email / reset password
+    adminUpdateCredentials: catchAsync(async (req: Request, res: Response) => {
+        const user = await UserService.adminUpdateCredentials(req.params.id, req.body);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Login credentials updated', data: user });
+    }),
+
+    // GET /api/users/admin/:id/credentials (admin) — read email + admin-visible password
+    getUserCredentials: catchAsync(async (req: Request, res: Response) => {
+        const data = await UserService.getUserCredentials(req.params.id);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Credentials fetched', data });
+    }),
+
     // GET /api/users/addresses
     getMyAddresses: catchAsync(async (req: Request, res: Response) => {
         const addresses = await UserService.getMyAddresses(req.user!.userId);
