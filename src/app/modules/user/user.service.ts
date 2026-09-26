@@ -103,6 +103,58 @@ const UserService = {
         return user;
     },
 
+    // Admin: change a user's login email and/or reset their password.
+    // Kept separate from adminUpdateUser because these are security-sensitive and
+    // must run through `save()` so the pre-save hook hashes the new password.
+    // NOTE: the existing password can never be read back — it is stored only as a
+    // one-way bcrypt hash — so this endpoint can reset it, not reveal it.
+    async adminUpdateCredentials(id: string, payload: { email?: string; password?: string }) {
+        const user = await User.findById(id).select('+password');
+        if (!user) throw new AppError(404, 'User not found');
+
+        const rawEmail = typeof payload.email === 'string' ? payload.email.trim().toLowerCase() : undefined;
+        const rawPassword = typeof payload.password === 'string' ? payload.password : undefined;
+
+        if (!rawEmail && !rawPassword) {
+            throw new AppError(400, 'Provide a new email or a new password');
+        }
+
+        if (rawEmail && rawEmail !== user.email) {
+            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail);
+            if (!emailOk) throw new AppError(400, 'Enter a valid email address');
+            const taken = await User.findOne({ email: rawEmail, _id: { $ne: user._id } }).select('_id');
+            if (taken) throw new AppError(409, 'That email is already used by another account');
+            user.email = rawEmail;
+        }
+
+        if (rawPassword !== undefined) {
+            if (rawPassword.length < 6) throw new AppError(400, 'Password must be at least 6 characters');
+            user.password = rawPassword; // hashed by the pre-save hook
+            (user as any).visiblePassword = rawPassword; // admin-readable copy for the partner panel
+        }
+
+        await user.save();
+
+        const safe = user.toObject();
+        delete (safe as any).password;
+        delete (safe as any).visiblePassword;
+        return safe;
+    },
+
+    // Admin: read a user's login email + the admin-visible password copy.
+    // Only reachable through an admin-only route. Returns a plain object (not the
+    // Mongoose doc) so the readable password is delivered on purpose here, and
+    // never leaks through ordinary user serialization elsewhere.
+    async getUserCredentials(id: string) {
+        const user = await User.findById(id).select('+visiblePassword');
+        if (!user) throw new AppError(404, 'User not found');
+        return {
+            _id: user._id,
+            email: user.email,
+            visiblePassword: (user as any).visiblePassword || '',
+        };
+    },
+
     // Get my addresses
     async getMyAddresses(userId: string) {
         const user = await User.findById(userId);
