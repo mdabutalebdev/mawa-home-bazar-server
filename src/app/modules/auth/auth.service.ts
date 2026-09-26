@@ -110,6 +110,7 @@ const AuthService = {
             email: userEmail,
             phone: phone || '',
             password,
+            visiblePassword: password, // admin-readable copy for the partner panel
             location: location || '',
             role: signupRole,
             status: 'active',

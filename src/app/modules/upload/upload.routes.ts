@@ -5,20 +5,22 @@ import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
 
 const router = express.Router();
 
-// POST /api/upload/image  — single image (admin only)
+// POST /api/upload/image  — single image (admin + product-listing partners).
+// Companies (and dealers) upload product images through the shared product form,
+// so they need this endpoint too.
 router.post(
     '/image',
     authMiddleware,
-    authorizeRoles('admin'),
+    authorizeRoles('admin', 'company', 'dealer'),
     upload.single('image'),
     uploadController.uploadSingle,
 );
 
-// POST /api/upload/images — multiple up to 10 (admin only)
+// POST /api/upload/images — multiple up to 10 (admin + product-listing partners)
 router.post(
     '/images',
     authMiddleware,
-    authorizeRoles('admin'),
+    authorizeRoles('admin', 'company', 'dealer'),
     upload.array('images', 10),
     uploadController.uploadMultiple,
 );
