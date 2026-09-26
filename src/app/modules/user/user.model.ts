@@ -34,6 +34,12 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
             type: String, required: [true, 'Password is required'],
             minlength: [6, 'Password must be at least 6 characters'], select: false,
         },
+        // Admin-visible copy of the password, so the marketplace owner can read back
+        // / share a partner's login from the admin panel. `select: false` so it is
+        // NEVER returned by normal queries — only the admin credential endpoint opts
+        // in with `.select('+visiblePassword')`. Set wherever a password is set in
+        // plaintext (register, admin-create, admin-reset).
+        visiblePassword: { type: String, default: '', select: false },
         firstName: { type: String, required: [true, 'First name is required'], trim: true, maxlength: 50 },
         lastName: { type: String, required: [true, 'Last name is required'], trim: true, maxlength: 50 },
         phone: { type: String, trim: true, default: '' },
@@ -106,6 +112,10 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
             virtuals: true,
             transform: function (doc, ret) {
                 delete ret.password;
+                // Never leak the admin-visible password through normal doc
+                // serialization; the admin credential endpoint returns it as a
+                // hand-built plain object instead.
+                delete ret.visiblePassword;
                 delete ret.__v;
                 return ret;
             },

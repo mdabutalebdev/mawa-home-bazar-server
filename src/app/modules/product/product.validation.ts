@@ -29,6 +29,10 @@ const productCreateShape = z.object({
     category:    z.string({ required_error: 'Category is required', invalid_type_error: 'Category is required' }).min(1, 'Category is required'),
     subCategory: z.string().optional(),
 
+    // Company links (both optional): a "service" company and/or a "product" company.
+    serviceId:        z.string().optional().nullable(),
+    productCompanyId: z.string().optional().nullable(),
+
     // Specifications
     brand:        z.string().optional(),
     model:        z.string().optional(),

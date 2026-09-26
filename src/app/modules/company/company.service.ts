@@ -89,6 +89,7 @@ const CompanyService = {
             email,
             phone: ownerPhone ? String(ownerPhone).trim() : '',
             password: ownerPassword,
+            visiblePassword: ownerPassword, // admin-readable copy for the partner panel
             role: 'company',
             status: 'active',
             isEmailVerified: true,
